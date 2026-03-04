@@ -1,6 +1,5 @@
 import { Chart, useChart } from "@chakra-ui/charts";
 import { Spinner, Stack, Text } from "@chakra-ui/react";
-import _ from "lodash";
 import { useMemo } from "react";
 import {
   CartesianGrid,
@@ -27,10 +26,19 @@ const SalaryStatisticsPage = () => {
     }
 
     // Group employees into salary buckets by configured interval (e.g. every 5000).
-    const grouped = _.countBy(
-      employees,
-      (employee) => Math.floor(employee.salary / interval) * interval,
-    );
+    const grouped = employees.reduce<Record<number, number>>((acc, employee) => {
+      const rawSalary = employee.salary as unknown;
+      const salary = Number(
+        typeof rawSalary === "string" ? rawSalary.replace(/[^\d.-]/g, "") : rawSalary,
+      );
+      if (!Number.isFinite(salary)) {
+        return acc;
+      }
+
+      const bucket = Math.floor(salary / interval) * interval;
+      acc[bucket] = (acc[bucket] ?? 0) + 1;
+      return acc;
+    }, {});
 
     return Object.entries(grouped)
       .map(([amount, value]) => ({ amount: Number(amount), value }))
@@ -52,8 +60,13 @@ const SalaryStatisticsPage = () => {
         <Text color="fg.muted">No employees available for salary statistics.</Text>
       )}
       {!isLoading && data.length > 0 && (
-        <Chart.Root chart={chart} maxW="6xl">
-          <LineChart data={chart.data} margin={{ top: 12, right: 12, left: 8, bottom: 8 }}>
+        <Chart.Root chart={chart} maxW="6xl" w="100%">
+          <LineChart
+            accessibilityLayer
+            data={chart.data}
+            margin={{ top: 12, right: 12, left: 8, bottom: 8 }}
+            responsive
+          >
             <CartesianGrid vertical={false} />
             <XAxis
               axisLine={false}
