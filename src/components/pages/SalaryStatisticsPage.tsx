@@ -1,5 +1,5 @@
 import { Chart, useChart } from "@chakra-ui/charts";
-import { Spinner, Stack, Text } from "@chakra-ui/react";
+import { Box, Spinner, Stack, Text } from "@chakra-ui/react";
 import _ from "lodash";
 import { useMemo } from "react";
 import {
@@ -20,6 +20,7 @@ type SalaryPoint = {
 
 const salaryInterval = employeesConfig.salary.interval;
 const formatCurrency = (value: number) => `$${value.toLocaleString()}`;
+const desktopViewportOffset = "170px";
 
 const SalaryStatisticsPage = () => {
   const { employees, isLoading } = useEmployees();
@@ -45,7 +46,12 @@ const SalaryStatisticsPage = () => {
   const hasData = data.length > 0;
 
   return (
-    <Stack gap={6} px={{ base: 3, md: 6 }} pb={6}>
+    <Stack
+      gap={{ base: 6, md: 4 }}
+      h={{ md: `calc(100vh - ${desktopViewportOffset})` }}
+      px={{ base: 3, md: 6 }}
+      pb={{ base: 6, md: 0 }}
+    >
       <Text fontSize={{ base: "2rem", md: "2.5rem" }} fontWeight="semibold">
         Salary Statistics ({data.length} intervals)
       </Text>
@@ -54,41 +60,49 @@ const SalaryStatisticsPage = () => {
       ) : !hasData ? (
         <Text color="fg.muted">No employees available for salary statistics.</Text>
       ) : (
-        <Chart.Root chart={chart} maxW="6xl" w="100%">
-          <LineChart
-            accessibilityLayer
-            data={chart.data}
-            margin={{ top: 12, right: 12, left: 8, bottom: 8 }}
-            responsive
+        <Box flex={{ md: 1 }} minH={{ md: 0 }}>
+          <Chart.Root
+            aspectRatio={{ base: "landscape", md: "auto" }}
+            chart={chart}
+            h={{ md: "100%" }}
+            maxW="6xl"
+            w="100%"
           >
-            <CartesianGrid vertical={false} />
-            <XAxis
-              axisLine={false}
-              dataKey={chart.key("amount")}
-              tickLine={false}
-              tickMargin={8}
-              tickFormatter={(value: number) => formatCurrency(value)}
-            />
-            <YAxis allowDecimals={false} axisLine={false} tickLine={false} tickMargin={8} />
-            <RechartsTooltip
-              cursor={false}
-              content={
-                <Chart.Tooltip
-                  formatter={(value) => [`${value}`, "Employees"]}
-                  labelFormatter={(value) => `From ${formatCurrency(Number(value))}`}
-                />
-              }
-            />
-            <Line
-              activeDot={{ r: 6 }}
-              dataKey={chart.key("value")}
-              dot={{ fill: chart.color("teal.solid") }}
-              stroke={chart.color("teal.solid")}
-              strokeWidth={2}
-              type="monotone"
-            />
-          </LineChart>
-        </Chart.Root>
+            <LineChart
+              accessibilityLayer
+              data={chart.data}
+              margin={{ top: 12, right: 12, left: 8, bottom: 8 }}
+              responsive
+            >
+              <CartesianGrid vertical={false} />
+              <XAxis
+                axisLine={false}
+                dataKey={chart.key("amount")}
+                tickLine={false}
+                tickMargin={8}
+                tickFormatter={(value: number) => formatCurrency(value)}
+              />
+              <YAxis allowDecimals={false} axisLine={false} tickLine={false} tickMargin={8} />
+              <RechartsTooltip
+                cursor={false}
+                content={
+                  <Chart.Tooltip
+                    formatter={(value) => [`${value}`, "Employees"]}
+                    labelFormatter={(value) => `From ${formatCurrency(Number(value))}`}
+                  />
+                }
+              />
+              <Line
+                activeDot={{ r: 6 }}
+                dataKey={chart.key("value")}
+                dot={{ fill: chart.color("teal.solid") }}
+                stroke={chart.color("teal.solid")}
+                strokeWidth={2}
+                type="monotone"
+              />
+            </LineChart>
+          </Chart.Root>
+        </Box>
       )}
     </Stack>
   );
