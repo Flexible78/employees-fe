@@ -9,7 +9,8 @@ export default function useEmployees(config?: AxiosRequestConfig): {employees: E
         config && queryKey.push(config)
         const result = useQuery<Employee[], AxiosError>({
             queryKey,
-            queryFn: () => apiClient.getEmployees(config)
+            queryFn: () => apiClient.getEmployees(config),
+            staleTime: 3600_000
         })
         return {employees: result.data || [], error: result.error, isLoading: result.isLoading}
      }

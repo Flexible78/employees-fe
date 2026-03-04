@@ -1,111 +1,78 @@
-import { Chart, useChart } from "@chakra-ui/charts";
-import { Box, Spinner, Stack, Text } from "@chakra-ui/react";
+import { VStack, Text } from "@chakra-ui/react";
 import _ from "lodash";
+import useEmployees from "../../services/hooks/useEmployees";
 import { useMemo } from "react";
+import employeesConfig from "../../config/employees-config";
+import { Chart, useChart } from "@chakra-ui/charts";
 import {
   CartesianGrid,
   Line,
   LineChart,
-  Tooltip as RechartsTooltip,
+  Tooltip,
   XAxis,
   YAxis,
 } from "recharts";
-import employeesConfig from "../../config/employees-config";
-import useEmployees from "../../services/hooks/useEmployees";
-
-type SalaryPoint = {
-  amount: number;
-  value: number;
-};
-
-const salaryInterval = employeesConfig.salary.interval;
-const formatCurrency = (value: number) => `$${value.toLocaleString()}`;
-const desktopViewportOffset = "170px";
-
 const SalaryStatisticsPage = () => {
-  const { employees, isLoading } = useEmployees();
-
-  const data: SalaryPoint[] = useMemo(() => {
-    return _.chain(employees)
-      .map("salary")
-      .map((salary) => Number(salary))
-      .filter((salary) => Number.isFinite(salary))
-      .map((salary) => Math.floor(salary / salaryInterval) * salaryInterval)
-      .countBy()
-      .toPairs()
-      .map(([amount, value]) => ({ amount: Number(amount), value }))
-      .sortBy("amount")
-      .value();
-  }, [employees]);
-
+  const { employees } = useEmployees();
+  const data: { amount: number; value: number }[] = useMemo(() => {
+    const numbers: number[] = employees.map((empl) => empl.salary);
+    const interval = employeesConfig.salary.interval;
+    const objStat = _.countBy(numbers, (num) => Math.floor(num / interval));
+    const data: { amount: number; value: number }[] = Object.entries(
+      objStat,
+    ).map(([key, value]) => ({
+      amount: value,
+      value: +key * interval + interval,
+    }));
+    return data;
+  }, [employees, employeesConfig.salary.interval]);
   const chart = useChart({
     data,
-    series: [{ name: "value", label: "Employees", color: "teal.solid" }],
+    series: [{ name: "amount", color: "teal.solid" }],
   });
 
-  const hasData = data.length > 0;
-
   return (
-    <Stack
-      gap={{ base: 6, md: 4 }}
-      h={{ md: `calc(100vh - ${desktopViewportOffset})` }}
-      px={{ base: 3, md: 6 }}
-      pb={{ base: 6, md: 0 }}
-    >
-      <Text fontSize={{ base: "2rem", md: "2.5rem" }} fontWeight="semibold">
-        Salary Statistics ({data.length} intervals)
-      </Text>
-      {isLoading ? (
-        <Spinner />
-      ) : !hasData ? (
-        <Text color="fg.muted">No employees available for salary statistics.</Text>
-      ) : (
-        <Box flex={{ md: 1 }} minH={{ md: 0 }}>
-          <Chart.Root
-            aspectRatio={{ base: "landscape", md: "auto" }}
-            chart={chart}
-            h={{ md: "100%" }}
-            maxW="6xl"
-            w="100%"
-          >
-            <LineChart
-              accessibilityLayer
-              data={chart.data}
-              margin={{ top: 12, right: 12, left: 8, bottom: 8 }}
-              responsive
-            >
-              <CartesianGrid vertical={false} />
-              <XAxis
-                axisLine={false}
-                dataKey={chart.key("amount")}
-                tickLine={false}
-                tickMargin={8}
-                tickFormatter={(value: number) => formatCurrency(value)}
-              />
-              <YAxis allowDecimals={false} axisLine={false} tickLine={false} tickMargin={8} />
-              <RechartsTooltip
-                cursor={false}
-                content={
-                  <Chart.Tooltip
-                    formatter={(value) => [`${value}`, "Employees"]}
-                    labelFormatter={(value) => `From ${formatCurrency(Number(value))}`}
-                  />
-                }
-              />
+    <VStack justifyContent={"center"} alignItems={"center"} px={2} marginTop={{base: "15vh", sm:0}}>
+      <Text as="h1" fontWeight={"bold"} fontSize={"1.2rem"}>Salaries Distribution Statistics</Text>
+      <Chart.Root
+        chart={chart}
+        width={{ base: "95vw", md: "80vw" }}
+        h={{ base: "xs", sm: "60vh", md: "md" }}
+      >
+          <LineChart data={chart.data} responsive>
+            <CartesianGrid stroke={chart.color("border")} vertical={false} />
+            <XAxis
+              axisLine={false}
+              dataKey={chart.key("value")}
+              stroke={chart.color("border")}
+              label={{ value: "Salary(NIS)", position: "bottom" }}
+            />
+            <YAxis
+              axisLine={false}
+              tickLine={false}
+              tickMargin={10}
+              stroke={chart.color("border")}
+              label={{ value: "Employees", position: "left", angle: -90 }}
+            />
+            <Tooltip
+              animationDuration={100}
+              cursor={false}
+              content={<Chart.Tooltip />}
+            />
+            {chart.series.map((item) => (
               <Line
-                activeDot={{ r: 6 }}
-                dataKey={chart.key("value")}
-                dot={{ fill: chart.color("teal.solid") }}
-                stroke={chart.color("teal.solid")}
+                key={item.name}
+                isAnimationActive={false}
+                dataKey={chart.key(item.name)}
+                stroke={chart.color(item.color)}
                 strokeWidth={2}
-                type="monotone"
+                dot={false}
               />
-            </LineChart>
-          </Chart.Root>
-        </Box>
-      )}
-    </Stack>
+            ))}
+          </LineChart>
+      </Chart.Root>
+    </VStack>
   );
 };
 
-export default SalaryStatisticsPage
+export default SalaryStatisticsPage;
