@@ -13,7 +13,7 @@ type StatisticsLineChartProps = {
   title: string;
   xAxisLabel: string;
   yAxisLabel: string;
-  xTickFormatter?: (value: number) => number | string;
+  xTickFormatter?: (value: number) => string;
   color?: string;
 };
 
@@ -58,7 +58,7 @@ const StatisticsLineChart = ({
               label={{ value: xAxisLabel, position: "bottom" }}
               stroke={chart.color("border")}
               tickFormatter={(value) =>
-                xTickFormatter ? xTickFormatter(Number(value)) : Number(value)
+                xTickFormatter ? xTickFormatter(Number(value)) : String(Number(value))
               }
             />
             <YAxis
