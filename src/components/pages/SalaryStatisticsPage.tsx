@@ -1,5 +1,6 @@
 import { Chart, useChart } from "@chakra-ui/charts";
 import { Spinner, Stack, Text } from "@chakra-ui/react";
+import _ from "lodash";
 import { useMemo } from "react";
 import {
   CartesianGrid,
@@ -17,49 +18,42 @@ type SalaryPoint = {
   value: number;
 };
 
+const salaryInterval = employeesConfig.salary.interval;
+const formatCurrency = (value: number) => `$${value.toLocaleString()}`;
+
 const SalaryStatisticsPage = () => {
   const { employees, isLoading } = useEmployees();
+
   const data: SalaryPoint[] = useMemo(() => {
-    const interval = employeesConfig.salary.interval;
-    if (!employees.length) {
-      return [];
-    }
-
-    // Group employees into salary buckets by configured interval (e.g. every 5000).
-    const grouped = employees.reduce<Record<number, number>>((acc, employee) => {
-      const rawSalary = employee.salary as unknown;
-      const salary = Number(
-        typeof rawSalary === "string" ? rawSalary.replace(/[^\d.-]/g, "") : rawSalary,
-      );
-      if (!Number.isFinite(salary)) {
-        return acc;
-      }
-
-      const bucket = Math.floor(salary / interval) * interval;
-      acc[bucket] = (acc[bucket] ?? 0) + 1;
-      return acc;
-    }, {});
-
-    return Object.entries(grouped)
+    return _.chain(employees)
+      .map("salary")
+      .map((salary) => Number(salary))
+      .filter((salary) => Number.isFinite(salary))
+      .map((salary) => Math.floor(salary / salaryInterval) * salaryInterval)
+      .countBy()
+      .toPairs()
       .map(([amount, value]) => ({ amount: Number(amount), value }))
-      .sort((a, b) => a.amount - b.amount);
-  }, [employees, employeesConfig.salary.interval]);
+      .sortBy("amount")
+      .value();
+  }, [employees]);
 
   const chart = useChart({
     data,
     series: [{ name: "value", label: "Employees", color: "teal.solid" }],
   });
 
+  const hasData = data.length > 0;
+
   return (
     <Stack gap={6} px={{ base: 3, md: 6 }} pb={6}>
       <Text fontSize={{ base: "2rem", md: "2.5rem" }} fontWeight="semibold">
         Salary Statistics ({data.length} intervals)
       </Text>
-      {isLoading && <Spinner />}
-      {!isLoading && data.length === 0 && (
+      {isLoading ? (
+        <Spinner />
+      ) : !hasData ? (
         <Text color="fg.muted">No employees available for salary statistics.</Text>
-      )}
-      {!isLoading && data.length > 0 && (
+      ) : (
         <Chart.Root chart={chart} maxW="6xl" w="100%">
           <LineChart
             accessibilityLayer
@@ -73,7 +67,7 @@ const SalaryStatisticsPage = () => {
               dataKey={chart.key("amount")}
               tickLine={false}
               tickMargin={8}
-              tickFormatter={(value: number) => `$${value.toLocaleString()}`}
+              tickFormatter={(value: number) => formatCurrency(value)}
             />
             <YAxis allowDecimals={false} axisLine={false} tickLine={false} tickMargin={8} />
             <RechartsTooltip
@@ -81,7 +75,7 @@ const SalaryStatisticsPage = () => {
               content={
                 <Chart.Tooltip
                   formatter={(value) => [`${value}`, "Employees"]}
-                  labelFormatter={(value) => `From $${Number(value).toLocaleString()}`}
+                  labelFormatter={(value) => `From ${formatCurrency(Number(value))}`}
                 />
               }
             />
