@@ -1,7 +1,6 @@
-#  StatisticsLineChart
-## Reusable component for any numbers statistics
-## Create based on existing SalaryStatisticsPage
-# SalaryStatisticsPage
-## Update for applying StatisticsLineChart
-# AgeStaticsPage
-## Update for applying StatisticsLineChart
+#  Department Statistics
+## DepartmentsStatisticsPage
+### Follow TODO comments in the DepartmentsStatisticsPage component file
+### Fill DepartmentsTable component
+#### Table containing data according to the attached image
+![alt text](image.png)
