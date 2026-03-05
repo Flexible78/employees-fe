@@ -3,7 +3,7 @@ import ApiClient from "./ApiClient";
 import { type Employee } from "../models/Employee";
 import { type EmployeeUpdater } from "../models/EmployeeUpdater";
 const axiosInstance = axios.create({
-    baseURL: "http://localhost:3000/"
+    baseURL: "http://localhost:3001/"
 })
 class ApiClientJsonServer implements ApiClient {
     async getEmployees(config?: AxiosRequestConfig): Promise<Employee[]> {
@@ -20,7 +20,7 @@ class ApiClientJsonServer implements ApiClient {
     updateEmployee(_updater: EmployeeUpdater): Promise<Employee> {
         throw new Error("Method not implemented.");
     }
-    
+
 }
 const apiClient: ApiClient = new ApiClientJsonServer();
 export default apiClient;
