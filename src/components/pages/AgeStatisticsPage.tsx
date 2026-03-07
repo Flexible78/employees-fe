@@ -1,9 +1,7 @@
 import useEmployees from "../../services/hooks/useEmployees";
 import employeesConfig from "../../config/employees-config";
 import StatisticsLineChart from "../StatisticsLineChart";
-function getAge(birthdate: string): number {
-  return new Date().getFullYear() - new Date(birthdate).getFullYear()
-}
+import { getAge } from "../../utils/date_functions";
 
 const AgeStatisticsPage = () => {
   const { employees } = useEmployees();

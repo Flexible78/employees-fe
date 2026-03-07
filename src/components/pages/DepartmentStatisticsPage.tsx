@@ -5,45 +5,33 @@ import { DepartmentInfo } from '../../models/DepartmentInfo'
 import { Employee } from '../../models/Employee'
 import { useMemo } from 'react'
 import _ from 'lodash'
+import { getAge } from '../../utils/date_functions'
 
+/**
+ *
+ * @param employees
+ * returns arry of DepartmentInfo objects
+ */
 function getDepartmentsInfo(employees: Employee[]): DepartmentInfo[] {
-    const grouped = _.groupBy(employees, 'department');
-
-    return Object.entries(grouped).map(([deptName, emps]) => {
-
-
-        const ages = emps
-            .map(emp => {
-                // @ts-ignore
-                const dateString = emp.birthdate || emp.birthDate;
-
-                if (!dateString) return null;
-
-                const birthYear = new Date(dateString).getFullYear();
-                return new Date().getFullYear() - birthYear;
-            })
-
-            .filter(age => age !== null && !isNaN(age));
-
-
-        const finalAvgAge = ages.length > 0 ? _.round(_.mean(ages), 1) : 0;
-
-        return {
-            department: deptName,
-            nEmployees: emps.length,
-            avgSalary: _.round(_.meanBy(emps, 'salary'), 2),
-            avgAge: finalAvgAge
-        };
-    });
+    const groupObj = _.groupBy(employees, 'department')
+    return Object.entries(groupObj).map(([key, value]) => ({
+        department: key,
+        nEmployees: value.length,
+        avgSalary: _.round(_.meanBy(value, 'salary')),
+        avgAge: _.round(_.meanBy(value, (e) => getAge(e.birthdate))),
+    }))
 }
 
 const DepartmentStatisticsPage = () => {
-    const {employees} = useEmployees()
+    const { employees } = useEmployees()
     const data: DepartmentInfo[] = useMemo(() => getDepartmentsInfo(employees), [employees])
+
     return (
-        <Box w="100%" as="div" >
-            <Text fontSize="1.2rem" as="h1" textAlign={"center"} fontWeight={"bold"}>Departments Statistics Page</Text>
-            <DepartmentsTable departmentsInfo={data}></DepartmentsTable>
+        <Box w="100%" as="div">
+            <Text fontSize="1.2rem" as="h1" textAlign="center" fontWeight="bold">
+                Departments Statistics Page
+            </Text>
+            <DepartmentsTable departmentsInfo={data} />
         </Box>
     )
 }
