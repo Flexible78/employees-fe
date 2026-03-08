@@ -288,6 +288,7 @@ onOpenChange={(e) => setOpen(e.open)}
 4. вызывается `setOpen`.
 
 ---
+
 ## 9. Таблица сотрудников
 
 Файл: `src/components/Employees.tsx`
@@ -1058,6 +1059,7 @@ const data: DepartmentInfo[] = useMemo(() => getDepartmentsInfo(employees), [emp
 - если менялся, пересчитываем.
 
 ---
+
 ## 18. Таблица по отделам
 
 Файл: `src/components/DepartmentsTable.tsx`
