@@ -8,10 +8,26 @@ const axiosInstance = axios.create({
 })
 class ApiClientJsonServer implements ApiClient {
     async getEmployees(filters?: FilterFields): Promise<Employee[]> {
-        // FIXME if parameter "filters" contains value to get config for Axios
-        let config: AxiosRequestConfig | undefined = undefined
+        let config: AxiosRequestConfig | undefined = undefined;
+
+        if (filters) {
+            const params: any = {};
+
+            if (filters.department && filters.department !== "Departments") {
+                params.department = filters.department;
+            }
+
+            if (filters.minSalary) params.salary_gte = filters.minSalary;
+            if (filters.maxSalary) params.salary_lte = filters.maxSalary;
+
+            if (filters.minAge) params.minAge = filters.minAge;
+            if (filters.maxAge) params.maxAge = filters.maxAge;
+
+            config = { params };
+        }
+
         const response = await axiosInstance.get<Employee[]>("employees", config);
-        return response.data
+        return response.data;
     }
     async addEmployee(empl: Employee): Promise<Employee> {
         const emplRes: Employee = await axiosInstance.post("employees", empl);
