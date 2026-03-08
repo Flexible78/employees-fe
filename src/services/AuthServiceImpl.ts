@@ -19,7 +19,7 @@ class AuthServiceDummy implements AuthService {
         if (!userData || userData.password !== loginData.password) {
             throw new AxiosError("Invalid credentials")
         }
-        return { email: loginData.email, username: userData.username, role: userData.role }
+        return {username: userData.username, role: userData.role}
 
     }
     logout(): Promise<void> {

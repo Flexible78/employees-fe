@@ -24,9 +24,11 @@ const EmployeeForm: FC<Props> = ({ submitter }) => {
         columns={{
           base: 1,
           sm: 2,
-          md: 3,
         }}
-        gap={10} marginLeft={10}
+        gap={10} marginLeft={{
+          base: "16",
+          lg: 72
+        }}
       >
         <Field.Root invalid={!!errors.department} width="80%" >
           <Field.Label>Department</Field.Label>

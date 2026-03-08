@@ -1,24 +1,16 @@
-import { Box } from '@chakra-ui/react'
-import { Outlet } from 'react-router-dom'
-import AppBar from '../AppBar'
-import LoginPage from './LoginPage' // 👈 Зовем нашего Менеджера с анкетами
-import { useUserData } from '../../services/hooks/useUserData' // 👈 Берем планшет
+import { Box } from "@chakra-ui/react";
+import { Outlet } from "react-router-dom";
+import AppBar from "../AppBar";
 
 const LayoutPage = () => {
-    const { userData } = useUserData()
+  return (
+    <>
+      <AppBar />
+      <Box marginTop={"4vh"}>
+        <Outlet></Outlet>
+      </Box>
+    </>
+  );
+};
 
-    if (!userData) {
-        return <LoginPage />
-    }
-
-    return (
-        <>
-            <AppBar />
-            <Box p={4}>
-                <Outlet />
-            </Box>
-        </>
-    )
-}
-
-export default LayoutPage
+export default LayoutPage;

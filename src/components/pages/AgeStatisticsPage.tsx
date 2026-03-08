@@ -3,6 +3,7 @@ import employeesConfig from "../../config/employees-config";
 import StatisticsLineChart from "../StatisticsLineChart";
 import { getAge } from "../../utils/date_functions";
 
+
 const AgeStatisticsPage = () => {
   const { employees } = useEmployees();
   

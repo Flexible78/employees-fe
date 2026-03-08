@@ -1,13 +1,18 @@
 import { Avatar, Spinner, Stack, Table } from "@chakra-ui/react";
-import useEmployees from "../services/hooks/useEmployees";
-
-const Employees = () => {
-  const { employees, isLoading } = useEmployees();
+import { FC } from "react";
+import { Employee } from "../models/Employee";
+type Props = {
+  employees: Employee[],
+  isLoading: boolean
+}
+const Employees: FC<Props> = ({employees, isLoading}) => {
+  
   return (
     <>
       {isLoading && <Spinner></Spinner>}
       <Stack justifyContent={"center"} alignItems={"center"} height={"100%"}>
-        <Table.ScrollArea borderWidth="1px" rounded="md" height="75vh" width={{base:"95vw", md: "80vw"}}>
+        <Table.ScrollArea borderWidth="1px" rounded="md" height="75vh"
+         width={{base:"95vw", md: "80vw"}}>
           <Table.Root size={{base: "sm", sm: "md", lg: "lg"}} stickyHeader>
             <Table.Header>
               <Table.Row bg="bg.subtle">

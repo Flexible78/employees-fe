@@ -5,6 +5,8 @@ import SalaryStatisticsPage from "../components/pages/SalaryStatisticsPage";
 import DepartmentStatisticsPage from "../components/pages/DepartmentStatisticsPage";
 import LayoutPage from "../components/pages/LayoutPage";
 import AddEmployeePage from "../components/pages/AddEmployeePage";
+import LoginPage from "../components/pages/LoginPage";
+import LogoutPage from "../components/pages/LogoutPage";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -23,6 +25,8 @@ const router = createBrowserRouter([
           },
         ],
       },
+      {path: "login", element: <LoginPage/>},
+      {path: "logout", element: <LogoutPage/>},
     ],
   },
 ]);

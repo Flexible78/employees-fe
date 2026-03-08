@@ -2,37 +2,25 @@ import axios, { AxiosRequestConfig } from "axios";
 import ApiClient from "./ApiClient";
 import { type Employee } from "../models/Employee";
 import { type EmployeeUpdater } from "../models/EmployeeUpdater";
-
+import { FilterFields } from "../models/FilterFields";
 const axiosInstance = axios.create({
     baseURL: "http://localhost:3001/"
 })
-
-type EmployeeResponse = Omit<Employee, "birthdate"> & {
-    birthDate?: string
-    birthdate?: string
-}
-
-function normalizeEmployee(employee: EmployeeResponse): Employee {
-    return {
-        ...employee,
-        birthdate: employee.birthdate ?? employee.birthDate ?? "",
-    }
-}
-
 class ApiClientJsonServer implements ApiClient {
-    async getEmployees(config?: AxiosRequestConfig): Promise<Employee[]> {
-        const response = await axiosInstance.get<EmployeeResponse[]>("employees", config);
-        return response.data.map(normalizeEmployee)
+    async getEmployees(filters?: FilterFields): Promise<Employee[]> {
+        // FIXME if parameter "filters" contains value to get config for Axios
+        let config: AxiosRequestConfig | undefined = undefined
+        const response = await axiosInstance.get<Employee[]>("employees", config);
+        return response.data
     }
     async addEmployee(empl: Employee): Promise<Employee> {
-        const payload = { ...empl, birthDate: empl.birthdate }
-        const response = await axiosInstance.post<EmployeeResponse>("employees", payload);
-        return normalizeEmployee(response.data)
+        const emplRes: Employee = await axiosInstance.post("employees", empl);
+        return emplRes
     }
-    deleteEmployee(_id: string): Promise<Employee> {
+    deleteEmployee(id: string): Promise<Employee> {
         throw new Error("Method not implemented.");
     }
-    updateEmployee(_updater: EmployeeUpdater): Promise<Employee> {
+    updateEmployee(updater: EmployeeUpdater): Promise<Employee> {
         throw new Error("Method not implemented.");
     }
 
