@@ -3,9 +3,18 @@ import useEmployees from '../../services/hooks/useEmployees';
 import Employees from '../Employees'
 import Filters from '../Filters';
 import { useFilters } from '../../state-management/filters-store';
+
 const HomePage = () => {
-    const { employees, isLoading } = useEmployees();
-    const resetToDefault = useFilters(s => s.resetToDefault)
+    const { department, minSalary, maxSalary, minAge, maxAge, resetToDefault } = useFilters();
+
+    const { employees, isLoading } = useEmployees({
+        department,
+        minSalary,
+        maxSalary,
+        minAge,
+        maxAge
+    });
+
     return (
         <VStack>
             <HStack>
