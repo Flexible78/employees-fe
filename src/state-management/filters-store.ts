@@ -14,7 +14,7 @@ export type FiltersStore = {
     setMaxSalary: (maxSalary: number) => void;
     resetToDefault: () =>void
 };
-const defaultValues: NonFunctionProps<FiltersStore> = {
+export const defaultFilterValues: NonFunctionProps<FiltersStore> = {
     department: "Departments",
     minSalary: employeesConfig.salary.min,
     maxSalary: employeesConfig.salary.max,
@@ -22,7 +22,7 @@ const defaultValues: NonFunctionProps<FiltersStore> = {
     maxAge: employeesConfig.age.max,
 };
 export const useFilters = create<FiltersStore>((set) => ({
-    ...defaultValues,
+    ...defaultFilterValues,
     setDepartment: (department) =>
         set((state) => (state.department === department ? state : { department })),
     setMinSalary: (minSalary) =>
@@ -33,5 +33,5 @@ export const useFilters = create<FiltersStore>((set) => ({
         set((state) => (state.maxAge === maxAge ? state : { maxAge })),
     setMinAge: (minAge) =>
         set((state) => (state.minAge === minAge ? state : { minAge })),
-    resetToDefault: () => set(() => ({...defaultValues}))
+    resetToDefault: () => set(() => ({...defaultFilterValues}))
 }));
