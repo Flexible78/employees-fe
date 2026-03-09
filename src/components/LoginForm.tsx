@@ -10,6 +10,7 @@ interface Props {
 const LoginForm: FC<Props> = ({submitter}) => {
   const {
     register,
+    reset,
     handleSubmit,
     formState: { errors },
     resetField

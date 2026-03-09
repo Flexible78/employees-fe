@@ -2,62 +2,41 @@ import axios, { AxiosRequestConfig } from "axios";
 import ApiClient from "./ApiClient";
 import { type Employee } from "../models/Employee";
 import { type EmployeeUpdater } from "../models/EmployeeUpdater";
-import { ActiveFilters } from "../models/FilterFields";
+import { FilterFields } from "../models/FilterFields";
+import { defaultValues } from "../state-management/filters-store";
 import { getIsoDateFromAge } from "../utils/date_functions";
-
 const axiosInstance = axios.create({
-    baseURL: "http://localhost:3001/"
+    baseURL: "http://localhost:3000/"
 })
-
+function getConfig(filters: FilterFields): AxiosRequestConfig {
+    const {department, minAge, maxAge,minSalary, maxSalary} = filters;
+      const maxDate = getIsoDateFromAge(minAge);
+      const minDate = getIsoDateFromAge(maxAge);
+    return {params: {department: department === defaultValues.department ? null : department,
+                     birthdate_gte: getIsoDateFromAge(defaultValues.maxAge) ==  minDate ? null : minDate,
+                     birthdate_lte:  getIsoDateFromAge(defaultValues.minAge) ==  maxDate ? null : maxDate,  
+                     salary_gte: defaultValues.minSalary == minSalary ? null : minSalary,
+                     salary_lte: defaultValues.maxSalary == maxSalary ? null : maxSalary
+    }}
+}
 class ApiClientJsonServer implements ApiClient {
-    async getEmployees(filters?: ActiveFilters): Promise<Employee[]> {
-        let config: AxiosRequestConfig | undefined = undefined;
-
-        if (filters) {
-            const params: any = {};
-
-            if (filters.department) {
-                params.department = filters.department;
-            }
-
-            if (filters.minSalary !== undefined) params.salary_gte = filters.minSalary;
-            if (filters.maxSalary !== undefined) params.salary_lte = filters.maxSalary;
-
-            if (filters.minAge !== undefined) params.birthDate_lte = getIsoDateFromAge(filters.minAge);
-            if (filters.maxAge !== undefined) params.birthDate_gte = getIsoDateFromAge(filters.maxAge);
-
-            config = { params };
-        }
-
-
-        const response = await axiosInstance.get<any[]>("employees", config);
-
-        const fixedEmployees = response.data.map(emp => {
-            const realDate = emp.birthDate || emp.birthdate || emp.dateOfBirth;
-
-            return {
-                ...emp,
-                birthDate: realDate,
-                birthdate: realDate
-            }
-        });
-
-        return fixedEmployees as Employee[];
+    async getEmployees(filters?: FilterFields): Promise<Employee[]> {
+        const config: AxiosRequestConfig | undefined = filters ?
+         getConfig(filters) : undefined
+        const response = await axiosInstance.get<Employee[]>("employees", config);
+        return response.data
     }
-
     async addEmployee(empl: Employee): Promise<Employee> {
         const emplRes: Employee = await axiosInstance.post("employees", empl);
         return emplRes
     }
-
-    deleteEmployee(_id: string): Promise<Employee> {
+    deleteEmployee(id: string): Promise<Employee> {
         throw new Error("Method not implemented.");
     }
-
-    updateEmployee(_updater: EmployeeUpdater): Promise<Employee> {
+    updateEmployee(updater: EmployeeUpdater): Promise<Employee> {
         throw new Error("Method not implemented.");
     }
+    
 }
-
 const apiClient: ApiClient = new ApiClientJsonServer();
 export default apiClient;
