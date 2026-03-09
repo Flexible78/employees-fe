@@ -2,7 +2,7 @@ import { Avatar, IconButton, Spinner, Stack, Table } from "@chakra-ui/react";
 import { FC, ReactNode } from "react";
 import { Employee } from "../models/Employee";
 import {FaSort, FaSortUp, FaSortDown} from "react-icons/fa"
-import { Order, SortByFieldsStore, SortField, useSortByFields } from "../state-management/sort-store";
+import { SortByFieldsStore, SortField, useSortByFields } from "../state-management/sort-store";
 type Props = {
   employees: Employee[],
   isLoading: boolean
