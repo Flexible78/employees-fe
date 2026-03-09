@@ -17,7 +17,10 @@ const HomePage = () => {
         <VStack>
             <HStack>
                 <Filters/>
-                <Button onClick={() => {resetToDefault(); resetOrder()}}>Reset to Default</Button>
+                <Button variant="outline"
+                        color="gray.600"
+                        borderColor="gray.400"
+                        _hover={{ bg: "whiteAlpha.100", color: "lightblue", borderColor: "gray.400" }} onClick={() => {resetToDefault(); resetOrder()}}>Reset to Default</Button>
             </HStack>
             <Employees employees={employees} isLoading={isLoading}/>
         </VStack>

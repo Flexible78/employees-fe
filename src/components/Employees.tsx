@@ -28,7 +28,22 @@ function getIcon(field: SortField, sortOptions: SortByFieldsStore): ReactNode {
   if (order != "no") {
     result = order == "asc" ? <FaSortUp> </FaSortUp> : <FaSortDown></FaSortDown>
   }
-  return <IconButton size="xs" marginLeft={2} onClick={() => updateSortingState(field, sortOptions)}>{result}</IconButton>;
+
+  // 👈 МАГИЯ ЗДЕСЬ: Красивые кнопки сортировки на сером фоне
+  return (
+      <IconButton
+          size="xs"
+          marginLeft={2}
+          bg="gray.600"
+          color="white"
+          _hover={{ bg: "gray.500" }}
+          borderRadius="md"
+          aria-label="Sort"
+          onClick={() => updateSortingState(field, sortOptions)}
+      >
+        {result}
+      </IconButton>
+  );
 }
 
 function getSortingFields(sortOptions:SortByFieldsStore): SortField[] {
@@ -66,16 +81,29 @@ const Employees: FC<Props> = ({employees, isLoading}) => {
 
   return (
       <>
+        {/* 👈 МАГИЯ ЗДЕСЬ: Окно теперь благородного серого цвета (gray.700) с белым текстом */}
         {employeeToDelete && (
-            <Box position="fixed" top="0" left="0" w="100vw" h="100vh" bg="blackAlpha.600" zIndex="1000" display="flex" alignItems="center" justifyContent="center">
-              <Box bg="white" p={6} rounded="md" shadow="xl" maxW="400px" color="black" mx={4}>
+            <Box position="fixed" top="0" left="0" right="0" bottom="0" bg="blackAlpha.600" zIndex={9999} display="flex" alignItems="flex-start" justifyContent="center" pt="20vh" px={4}>
+              <Box bg="gray.700" p={6} rounded="xl" shadow="2xl" maxW="400px" w="100%" color="white">
                 <Text fontSize="xl" fontWeight="bold" mb={4}>Are you sure?</Text>
-                <Text mb={6}>
+                <Text mb={6} color="gray.300">
                   This action cannot be undone. This will permanently delete <b>{employeeToDelete.fullName}</b> and remove their data from our systems.
                 </Text>
                 <HStack justifyContent="flex-end" gap={4}>
-                  <Button colorScheme="gray" variant="outline" onClick={() => setEmployeeToDelete(null)}>Cancel</Button>
-                  <Button colorScheme="red" loading={deleteMutation.isPending} onClick={handleConfirmDelete}>Delete</Button>
+                  <Button bg="gray.600" color="white" _hover={{ bg: "gray.500" }} onClick={() => setEmployeeToDelete(null)}>
+                    Cancel
+                  </Button>
+
+                  <Button
+                      bg="#00AFF0"
+                      color="white"
+                      _hover={{ bg: "#008CC0" }}
+                      loading={deleteMutation.isPending}
+                      onClick={handleConfirmDelete}
+                  >
+                    Delete
+                  </Button>
+
                 </HStack>
               </Box>
             </Box>
@@ -84,12 +112,10 @@ const Employees: FC<Props> = ({employees, isLoading}) => {
         {isLoading && <Spinner></Spinner>}
 
         <Stack justifyContent={"center"} alignItems={"center"} height={"100%"}>
-          {/* 👈 МАГИЯ ЗДЕСЬ: Добавили overflowX="auto", чтобы таблица скроллилась вбок на мобилке */}
           <Table.ScrollArea borderWidth="1px" rounded="md" height="75vh" width={{base:"95vw", md: "80vw"}} overflowX="auto">
             <Table.Root size={{base: "sm", sm: "md", lg: "lg"}} stickyHeader>
               <Table.Header>
                 <Table.Row bg="bg.subtle">
-                  {/* Убрали все hideBelow! Ничего не пропадает! */}
                   <Table.ColumnHeader></Table.ColumnHeader>
                   <Table.ColumnHeader>Full Name {getIcon("fullName", sortOptions)}</Table.ColumnHeader>
                   <Table.ColumnHeader>Department{getIcon("department", sortOptions)}</Table.ColumnHeader>
