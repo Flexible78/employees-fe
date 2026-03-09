@@ -1,5 +1,5 @@
 export function getAge(birthDate: string): number {
-    return new Date().getFullYear()
+  return new Date().getFullYear()
       - new Date(birthDate).getFullYear()
 }
 export function getIsoDateFromAge(age: number): string {

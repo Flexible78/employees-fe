@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { NonFunctionProps } from "../utils/util-types";
+import omit from "lodash/omit"
 export type Order = "asc" | "desc" | "no";
 export type SortByFieldsStore = {
   department: Order;
@@ -16,12 +17,13 @@ const defaultValues: NonFunctionProps<SortByFieldsStore> = {
   salary: "no",
   birthdate: "no",
 };
+const defaultValuesNoDepartment = omit(defaultValues, "department")
 //sorting is implied only by one field
 export const useSortByFields = create<SortByFieldsStore>((set) => ({
   ...defaultValues,
   setOrder: (field, order) =>
-    set((state) =>
-      state[field] === order ? state : { ...defaultValues, [field]: order },
-    ),
+      set((state) =>
+          state[field] === order ? state : { ...defaultValuesNoDepartment, [field]: order },
+      ),
   resetOrder: () => set(() => ({ ...defaultValues })),
 }));
