@@ -27,24 +27,7 @@ const FiltersForm: FC<Props> = ({filterFields, submitter}) => {
         }}
         gap={10} 
       >
-        <Field.Root  width="80%" >
-          <Field.Label>Department</Field.Label>
-          <NativeSelect.Root>
-            <NativeSelect.Field
-              {...register("department")}
-            >
-                <option value="Departments">Departments</option>
-              {employeesConfig.departments.map((d) => (
-                <option value={d} key={d}>
-                  {d}
-                </option>
-              ))}
-            </NativeSelect.Field>
-
-            <NativeSelect.Indicator />
-          </NativeSelect.Root>
-          <Field.ErrorText>Selection of Department is required</Field.ErrorText>
-        </Field.Root>
+        
         <Field.Root invalid={!!errors.minAge}  width="80%">
           <Field.Label>Min Age</Field.Label>
           <Input  type="number" {...register("minAge", {required: "Min Age must be defined", valueAsNumber: true,
@@ -77,7 +60,24 @@ const FiltersForm: FC<Props> = ({filterFields, submitter}) => {
            })}/>
           <Field.ErrorText>{errors.maxSalary?.message}</Field.ErrorText>
         </Field.Root>
-       
+       <Field.Root  width="80%" >
+          <Field.Label>Department</Field.Label>
+          <NativeSelect.Root>
+            <NativeSelect.Field
+              {...register("department")}
+            >
+                <option value="Departments">Departments</option>
+              {employeesConfig.departments.map((d) => (
+                <option value={d} key={d}>
+                  {d}
+                </option>
+              ))}
+            </NativeSelect.Field>
+
+            <NativeSelect.Indicator />
+          </NativeSelect.Root>
+          <Field.ErrorText>Selection of Department is required</Field.ErrorText>
+        </Field.Root>
       </SimpleGrid>
       <HStack justifyContent={"space-around"}>
         <Button type="submit" size={"xl"} variant="subtle">ok</Button>

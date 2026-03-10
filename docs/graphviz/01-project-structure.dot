@@ -1,0 +1,150 @@
+digraph ProjectStructure {
+  graph [
+    label="EMPLOYEES-FE | Project Structure",
+    labelloc="t",
+    fontsize=20,
+    fontname="Segoe UI",
+    rankdir=LR,
+    pad=0.3,
+    nodesep=0.4,
+    ranksep=0.9,
+    splines=true,
+    bgcolor="white"
+  ];
+
+  node [
+    shape=box,
+    style="rounded,filled",
+    fontname="Segoe UI",
+    fontsize=11,
+    color="#334155",
+    fillcolor="#f8fafc",
+    penwidth=1.1,
+    margin="0.16,0.09"
+  ];
+
+  edge [
+    color="#64748b",
+    penwidth=1.1,
+    arrowsize=0.8,
+    fontname="Segoe UI",
+    fontsize=10
+  ];
+
+  subgraph cluster_bootstrap {
+    label="Bootstrap";
+    color="#cbd5e1";
+    style="rounded";
+
+    main [label="src/main.tsx\nReact root + Chakra Provider\n+ QueryClientProvider + RouterProvider", fillcolor="#dbeafe"];
+  }
+
+  subgraph cluster_router {
+    label="Routing";
+    color="#cbd5e1";
+    style="rounded";
+
+    routes [label="src/router/routes.tsx\ncreateBrowserRouter()", fillcolor="#dbeafe"];
+    layout [label="LayoutPage.tsx\nlogin gate + App shell", fillcolor="#d1fae5"];
+    home [label="HomePage.tsx"];
+    add [label="AddEmployeePage.tsx"];
+    age [label="AgeStatisticsPage.tsx"];
+    salary [label="SalaryStatisticsPage.tsx"];
+    department [label="DepartmentStatisticsPage.tsx"];
+    loginPage [label="LoginPage.tsx", fillcolor="#fef3c7"];
+  }
+
+  subgraph cluster_components {
+    label="Reusable Components";
+    color="#cbd5e1";
+    style="rounded";
+
+    appBar [label="AppBar.tsx"];
+    employees [label="Employees.tsx"];
+    employeeForm [label="EmployeeForm.tsx"];
+    loginForm [label="LoginForm.tsx"];
+    statsSelector [label="StatisticsSelector.tsx"];
+    lineChart [label="StatisticsLineChart.tsx"];
+    departmentsTable [label="DepartmentsTable.tsx"];
+  }
+
+  subgraph cluster_hooks {
+    label="Hooks and Services";
+    color="#cbd5e1";
+    style="rounded";
+
+    useEmployees [label="useEmployees.ts\nReact Query useQuery()", fillcolor="#ede9fe"];
+    useMutation [label="useEmployeesMutation.ts\nReact Query useMutation()", fillcolor="#ede9fe"];
+    useUserData [label="useUserData.ts\nzustand auth store", fillcolor="#ede9fe"];
+    apiClient [label="ApiClientImpl.ts\naxios client + normalizeEmployee()", fillcolor="#fee2e2"];
+    authService [label="AuthServiceImpl.ts\ndummy auth service", fillcolor="#fee2e2"];
+  }
+
+  subgraph cluster_domain {
+    label="Models, Config, Utils";
+    color="#cbd5e1";
+    style="rounded";
+
+    employeeModel [label="models/Employee.ts", fillcolor="#f1f5f9"];
+    authModel [label="models/AuthData.ts", fillcolor="#f1f5f9"];
+    departmentModel [label="models/DepartmentInfo.ts", fillcolor="#f1f5f9"];
+    config [label="config/employees-config.ts", fillcolor="#f1f5f9"];
+    dateUtils [label="utils/date_functions.ts", fillcolor="#f1f5f9"];
+  }
+
+  api [shape=cylinder, label="JSON Server API\nhttp://localhost:3001/employees", fillcolor="#fecaca", color="#ef4444"];
+  dummyUsers [shape=cylinder, label="DUMMY_LOGIN_USERS\ninside AuthServiceImpl.ts", fillcolor="#fde68a", color="#d97706"];
+
+  legendRuntime [shape=note, label="solid edge = runtime usage", fillcolor="#ffffff", color="#94a3b8"];
+  legendType [shape=note, label="dashed edge = type/config helper", fillcolor="#ffffff", color="#94a3b8"];
+
+  main -> routes [label="loads"];
+  routes -> layout [label="root route"];
+  routes -> home;
+  routes -> add;
+  routes -> age;
+  routes -> salary;
+  routes -> department;
+
+  layout -> loginPage [label="if !userData"];
+  layout -> appBar [label="if userData"];
+  layout -> home [style=dashed, label="Outlet"];
+  layout -> add [style=dashed];
+  layout -> age [style=dashed];
+  layout -> salary [style=dashed];
+  layout -> department [style=dashed];
+
+  home -> employees;
+  add -> employeeForm;
+  add -> useMutation;
+  age -> useEmployees;
+  age -> lineChart;
+  salary -> useEmployees;
+  salary -> lineChart;
+  department -> useEmployees;
+  department -> departmentsTable;
+  loginPage -> loginForm;
+  loginPage -> authService;
+  loginPage -> useUserData;
+  appBar -> statsSelector;
+  appBar -> useUserData;
+  employees -> useEmployees;
+  employeeForm -> config [style=dashed];
+  employeeForm -> dateUtils [style=dashed];
+
+  useEmployees -> apiClient;
+  useEmployees -> employeeModel [style=dashed];
+  useMutation -> apiClient;
+  useUserData -> authModel [style=dashed];
+  authService -> authModel [style=dashed];
+  authService -> dummyUsers;
+  apiClient -> api;
+  apiClient -> employeeModel [style=dashed];
+  department -> departmentModel [style=dashed];
+  department -> dateUtils [style=dashed];
+  age -> config [style=dashed];
+  age -> dateUtils [style=dashed];
+  salary -> config [style=dashed];
+
+  legendRuntime -> legendType [style=invis];
+}

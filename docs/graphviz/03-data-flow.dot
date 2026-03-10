@@ -1,0 +1,131 @@
+digraph DataFlow {
+  graph [
+    label="EMPLOYEES-FE | Data Flow",
+    labelloc="t",
+    fontsize=20,
+    fontname="Segoe UI",
+    rankdir=LR,
+    pad=0.35,
+    nodesep=0.45,
+    ranksep=0.9,
+    splines=true,
+    bgcolor="white"
+  ];
+
+  node [
+    shape=box,
+    style="rounded,filled",
+    fontname="Segoe UI",
+    fontsize=11,
+    color="#334155",
+    fillcolor="#f8fafc",
+    penwidth=1.1,
+    margin="0.16,0.09"
+  ];
+
+  edge [
+    color="#64748b",
+    penwidth=1.1,
+    arrowsize=0.8,
+    fontname="Segoe UI",
+    fontsize=10
+  ];
+
+  subgraph cluster_read {
+    label="Read employees flow";
+    color="#bfdbfe";
+    style="rounded";
+
+    home [label="HomePage -> Employees", fillcolor="#dbeafe"];
+    age [label="AgeStatisticsPage", fillcolor="#dbeafe"];
+    salary [label="SalaryStatisticsPage", fillcolor="#dbeafe"];
+    department [label="DepartmentStatisticsPage", fillcolor="#dbeafe"];
+    useEmployees [label="useEmployees()\nuseQuery(['employees'])", fillcolor="#ede9fe"];
+    apiGet [label="ApiClientImpl.getEmployees()", fillcolor="#fee2e2"];
+    axiosGet [label="axios GET /employees", fillcolor="#fee2e2"];
+    normalize [label="normalizeEmployee()\nbirthDate -> birthdate", fillcolor="#fff7ed"];
+    employeesData [label="Employee[]", fillcolor="#f8fafc"];
+    lineChart [label="StatisticsLineChart", fillcolor="#ecfccb"];
+    deptTable [label="DepartmentsTable", fillcolor="#ecfccb"];
+    deptAggregate [label="groupBy + meanBy + getAge()\nDepartmentInfo[]", fillcolor="#fff7ed"];
+    ageBuckets [label="map birthdate -> getAge()\ncountBy(interval)", fillcolor="#fff7ed"];
+    salaryBuckets [label="map salary\ncountBy(interval)", fillcolor="#fff7ed"];
+  }
+
+  subgraph cluster_create {
+    label="Create employee flow";
+    color="#bbf7d0";
+    style="rounded";
+
+    addPage [label="AddEmployeePage", fillcolor="#dcfce7"];
+    employeeForm [label="EmployeeForm\nreact-hook-form", fillcolor="#fefce8"];
+    employeePayload [label="Employee payload", fillcolor="#f8fafc"];
+    useMutation [label="useEmployeesMutation()", fillcolor="#ede9fe"];
+    apiPost [label="ApiClientImpl.addEmployee()", fillcolor="#fee2e2"];
+    axiosPost [label="axios POST /employees", fillcolor="#fee2e2"];
+    invalidate [label="invalidateQueries(['employees'])", fillcolor="#fff7ed"];
+    navigateHome [label="Navigate to /", fillcolor="#dcfce7"];
+  }
+
+  subgraph cluster_auth {
+    label="Auth flow";
+    color="#fde68a";
+    style="rounded";
+
+    loginPage [label="LoginPage", fillcolor="#fef3c7"];
+    loginForm [label="LoginForm\nreact-hook-form", fillcolor="#fefce8"];
+    loginData [label="LoginData\n{ email, password }", fillcolor="#f8fafc"];
+    authService [label="AuthServiceImpl.login()", fillcolor="#fee2e2"];
+    dummyUsers [shape=cylinder, label="DUMMY_LOGIN_USERS", fillcolor="#fde68a", color="#d97706"];
+    userData [label="UserData\n{ email, username, role }", fillcolor="#f8fafc"];
+    userStore [label="useUserData store\nlogin/logout", fillcolor="#ede9fe"];
+    layout [label="LayoutPage", fillcolor="#d1fae5"];
+    appBar [label="AppBar", fillcolor="#d1fae5"];
+  }
+
+  server [shape=cylinder, label="JSON Server API\nlocalhost:3001/employees", fillcolor="#fecaca", color="#ef4444"];
+  config [shape=note, label="employees-config.ts\nage/salary intervals + departments", fillcolor="#ffffff"];
+  dateUtils [shape=note, label="date_functions.ts\ngetAge() / getIsoDateFromAge()", fillcolor="#ffffff"];
+
+  home -> useEmployees;
+  age -> useEmployees;
+  salary -> useEmployees;
+  department -> useEmployees;
+  useEmployees -> apiGet;
+  apiGet -> axiosGet;
+  axiosGet -> server;
+  apiGet -> normalize;
+  normalize -> employeesData;
+  employeesData -> home [label="table rows"];
+  employeesData -> ageBuckets;
+  employeesData -> salaryBuckets;
+  employeesData -> deptAggregate;
+  ageBuckets -> lineChart [label="numbers + interval"];
+  salaryBuckets -> lineChart [label="numbers + interval"];
+  deptAggregate -> deptTable;
+  age -> config [style=dashed];
+  salary -> config [style=dashed];
+  employeeForm -> config [style=dashed];
+  age -> dateUtils [style=dashed];
+  department -> dateUtils [style=dashed];
+  employeeForm -> dateUtils [style=dashed];
+
+  addPage -> employeeForm;
+  employeeForm -> employeePayload [label="submit"];
+  employeePayload -> useMutation;
+  useMutation -> apiPost;
+  apiPost -> axiosPost;
+  axiosPost -> server;
+  apiPost -> invalidate;
+  invalidate -> useEmployees [label="refetch list + stats"];
+  addPage -> navigateHome [label="after mutate"];
+
+  loginPage -> loginForm;
+  loginForm -> loginData [label="submit"];
+  loginData -> authService;
+  authService -> dummyUsers [label="lookup"];
+  authService -> userData [label="valid credentials"];
+  userData -> userStore [label="login(user)"];
+  userStore -> layout [label="userData state"];
+  userStore -> appBar [label="logout() + email + role"];
+}

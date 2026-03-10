@@ -1,0 +1,99 @@
+digraph RoutingFlow {
+  graph [
+    label="EMPLOYEES-FE | Routing and Auth Flow",
+    labelloc="t",
+    fontsize=20,
+    fontname="Segoe UI",
+    rankdir=LR,
+    pad=0.35,
+    nodesep=0.45,
+    ranksep=0.9,
+    splines=true,
+    bgcolor="white"
+  ];
+
+  node [
+    shape=box,
+    style="rounded,filled",
+    fontname="Segoe UI",
+    fontsize=11,
+    color="#334155",
+    fillcolor="#f8fafc",
+    penwidth=1.1,
+    margin="0.16,0.09"
+  ];
+
+  edge [
+    color="#64748b",
+    penwidth=1.1,
+    arrowsize=0.8,
+    fontname="Segoe UI",
+    fontsize=10
+  ];
+
+  browser [label="Browser", fillcolor="#dbeafe"];
+  main [label="main.tsx\nRouterProvider + QueryClientProvider", fillcolor="#dbeafe"];
+  router [label="routes.tsx\ncreateBrowserRouter()", fillcolor="#dbeafe"];
+  layout [label="LayoutPage.tsx", fillcolor="#d1fae5"];
+  authCheck [shape=diamond, label="userData exists?", fillcolor="#fef3c7"];
+
+  subgraph cluster_login {
+    label="Login branch";
+    color="#fde68a";
+    style="rounded";
+
+    loginPage [label="LoginPage.tsx", fillcolor="#fef3c7"];
+    loginForm [label="LoginForm.tsx\nreact-hook-form", fillcolor="#fefce8"];
+    authService [label="AuthServiceImpl.login()", fillcolor="#fee2e2"];
+    credsCheck [shape=diamond, label="email + password valid?", fillcolor="#fefce8"];
+    authError [shape=note, label="setErrorMsg('Invalid credentials')", fillcolor="#fef2f2", color="#ef4444"];
+    userStoreLogin [label="useUserData.login(user)\nzustand update", fillcolor="#ede9fe"];
+  }
+
+  subgraph cluster_shell {
+    label="Authenticated app shell";
+    color="#bbf7d0";
+    style="rounded";
+
+    appShell [label="AppBar + Outlet", fillcolor="#d1fae5"];
+    home [label="Route /\nHomePage -> Employees", fillcolor="#ecfccb"];
+    statsMenu [label="StatisticsSelector", fillcolor="#ecfccb"];
+    age [label="/statistics/age", fillcolor="#ecfccb"];
+    salary [label="/statistics/salary", fillcolor="#ecfccb"];
+    department [label="/statistics/department", fillcolor="#ecfccb"];
+    roleCheck [shape=diamond, label="userData.role === 'ADMIN'?", fillcolor="#fef3c7"];
+    addLink [label="Show 'Add Employee' link", fillcolor="#dcfce7"];
+    addHidden [label="Hide 'Add Employee' link", fillcolor="#f8fafc"];
+    addPage [label="Route /add\nAddEmployeePage", fillcolor="#ecfccb"];
+    logout [label="Logout button\nuseUserData.logout()", fillcolor="#fee2e2"];
+  }
+
+  noRoleGuard [shape=note, label="Important:\nAppBar only hides the menu link.\nThe /add route still exists for any logged-in user.", fillcolor="#fff7ed", color="#f97316"];
+
+  browser -> main -> router -> layout -> authCheck;
+
+  authCheck -> loginPage [label="no"];
+  authCheck -> appShell [label="yes"];
+
+  loginPage -> loginForm [label="render"];
+  loginForm -> authService [label="submit email/password"];
+  authService -> credsCheck [label="check DUMMY_LOGIN_USERS"];
+  credsCheck -> authError [label="no"];
+  authError -> loginPage [label="show error"];
+  credsCheck -> userStoreLogin [label="yes"];
+  userStoreLogin -> layout [label="store update"];
+
+  appShell -> home [label="default route"];
+  appShell -> statsMenu [label="menu"];
+  statsMenu -> age;
+  statsMenu -> salary;
+  statsMenu -> department;
+  appShell -> roleCheck [label="AppBar render"];
+  roleCheck -> addLink [label="yes"];
+  roleCheck -> addHidden [label="no"];
+  addLink -> addPage [label="click"];
+  appShell -> addPage [style=dashed, label="direct URL /add"];
+  addPage -> noRoleGuard [color="#f97316"];
+  appShell -> logout [label="click"];
+  logout -> layout [label="userData = null"];
+}

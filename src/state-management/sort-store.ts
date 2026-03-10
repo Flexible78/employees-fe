@@ -22,8 +22,8 @@ const defaultValuesNoDepartment = omit(defaultValues, "department")
 export const useSortByFields = create<SortByFieldsStore>((set) => ({
   ...defaultValues,
   setOrder: (field, order) =>
-      set((state) =>
-          state[field] === order ? state : { ...defaultValuesNoDepartment, [field]: order },
-      ),
+    set((state) =>
+      state[field] === order ? state : { ...defaultValuesNoDepartment, [field]: order },
+    ),
   resetOrder: () => set(() => ({ ...defaultValues })),
 }));
