@@ -34,3 +34,4 @@ const DepartmentsTable: FC<Props> = ({departmentsInfo}) => {
 }
 
 export default DepartmentsTable
+

@@ -105,10 +105,14 @@ const EmployeeForm: FC<Props> = ({ employee, submitter }) => {
         <Button type="reset" size={"xl"} variant="subtle">
           {!!employee ? "Undo" : "Reset"}
         </Button>
-        {!!employee && <Button type="button" onClick={() => submitter(employee)}>Cancel</Button>}
+        {!!employee && <Button type="button" onClick={(e) => {
+          e.stopPropagation()
+          submitter(employee)
+          }}>Cancel</Button>}
       </HStack>
     </Stack>
   );
 };
 
 export default EmployeeForm;
+

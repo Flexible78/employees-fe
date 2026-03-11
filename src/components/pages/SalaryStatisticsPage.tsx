@@ -11,3 +11,4 @@ const SalaryStatisticsPage = () => {
 };
 
 export default SalaryStatisticsPage;
+

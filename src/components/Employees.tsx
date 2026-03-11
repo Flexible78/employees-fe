@@ -10,6 +10,7 @@ import apiClient from "../services/ApiClientImpl";
 import ConfirmDialog from "./ConfirmationDialog";
 import { MdDelete } from "react-icons/md";
 import EditEmployee from "./EditEmployee";
+import DeleteEmployee from "./DeleteEmployee";
 
 type Props = {
   employees: Employee[]
@@ -79,9 +80,7 @@ const Employees: FC<Props> = ({employees, isLoading}) => {
                   <Table.Cell >{empl.salary}</Table.Cell>
                   <Table.Cell hideBelow={"sm"} >{empl.birthdate}</Table.Cell>
                    { role === "ADMIN" && <Table.Cell >
-                       <ConfirmDialog content={`Deleting employee ${empl.fullName}` } onClose={(isDelete) => {
-                        isDelete && mutationDel.mutate(empl.id!)
-                       }} isPending={mutationDel.isPending} icon={<MdDelete></MdDelete>}></ConfirmDialog>
+                      <DeleteEmployee empl={empl}/>
                       </Table.Cell>}
                        { role === "ADMIN" && <Table.Cell >
                        <EditEmployee employee={empl}/>
@@ -97,3 +96,4 @@ const Employees: FC<Props> = ({employees, isLoading}) => {
 };
 
 export default Employees;
+

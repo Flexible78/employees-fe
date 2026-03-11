@@ -59,3 +59,4 @@ const ConfirmDialog: FC<Props> = ({ content, onClose, isPending, icon }) => {
 };
 
 export default ConfirmDialog;
+

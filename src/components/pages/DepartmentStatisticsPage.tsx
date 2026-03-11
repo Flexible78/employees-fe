@@ -33,3 +33,4 @@ const DepartmentStatisticsPage = () => {
 }
 
 export default DepartmentStatisticsPage
+
