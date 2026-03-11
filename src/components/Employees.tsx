@@ -9,6 +9,7 @@ import useEmployeesMutation from "../services/hooks/useEmployeesMutation";
 import apiClient from "../services/ApiClientImpl";
 import ConfirmDialog from "./ConfirmationDialog";
 import { MdDelete } from "react-icons/md";
+import EditEmployee from "./EditEmployee";
 
 type Props = {
   employees: Employee[]
@@ -61,6 +62,7 @@ const Employees: FC<Props> = ({employees, isLoading}) => {
                 <Table.ColumnHeader>Salary{getIcon("salary", sortOptions)}</Table.ColumnHeader>
                 <Table.ColumnHeader hideBelow={"sm"}>Birthdate{getIcon("birthdate", sortOptions)}</Table.ColumnHeader>
                 {role == "ADMIN" && <Table.ColumnHeader ></Table.ColumnHeader>}
+                 {role == "ADMIN" && <Table.ColumnHeader ></Table.ColumnHeader>}
               </Table.Row>
             </Table.Header>
             <Table.Body>
@@ -80,6 +82,9 @@ const Employees: FC<Props> = ({employees, isLoading}) => {
                        <ConfirmDialog content={`Deleting employee ${empl.fullName}` } onClose={(isDelete) => {
                         isDelete && mutationDel.mutate(empl.id!)
                        }} isPending={mutationDel.isPending} icon={<MdDelete></MdDelete>}></ConfirmDialog>
+                      </Table.Cell>}
+                       { role === "ADMIN" && <Table.Cell >
+                       <EditEmployee employee={empl}/>
                       </Table.Cell>}
                 </Table.Row>
               ))}
