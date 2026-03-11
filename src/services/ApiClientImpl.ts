@@ -8,11 +8,6 @@ import { getIsoDateFromAge } from "../utils/date_functions";
 const axiosInstance = axios.create({
     baseURL: "http://localhost:3000/"
 })
-type ApiEmployee = Partial<Employee> & { birthDate?: string };
-function normalizeEmployee(employee: ApiEmployee): Employee {
-    const birthdate = employee.birthdate ?? employee.birthDate ?? "";
-    return { ...(employee as Employee), birthdate };
-}
 function getConfig(filters: FilterFields): AxiosRequestConfig {
     const {department, minAge, maxAge,minSalary, maxSalary} = filters;
       const maxDate = getIsoDateFromAge(minAge);
@@ -29,19 +24,19 @@ class ApiClientJsonServer implements ApiClient {
         const config: AxiosRequestConfig | undefined = filters ?
          getConfig(filters) : undefined
         const response = await axiosInstance.get<Employee[]>("employees", config);
-        return response.data.map(empl => normalizeEmployee(empl as ApiEmployee))
+        return response.data
     }
     async addEmployee(empl: Employee): Promise<Employee> {
         const res = await axiosInstance.post<Employee>("employees", empl);
-        return normalizeEmployee(res.data as ApiEmployee)
+        return res.data
     }
     async deleteEmployee(id: string): Promise<Employee> {
        const res = await axiosInstance.delete<Employee>(`employees/${id}`);
-        return normalizeEmployee(res.data as ApiEmployee)
+        return res.data
     }
     async updateEmployee(updater: EmployeeUpdater): Promise<Employee> {
         const res = await axiosInstance.patch<Employee>(`employees/${updater.id}`, updater.fields)
-        return normalizeEmployee(res.data as ApiEmployee);
+        return res.data;
     }
     
 }

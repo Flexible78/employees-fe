@@ -1,4 +1,4 @@
-import { AxiosError } from "axios";
+import { AxiosError, AxiosRequestConfig } from "axios";
 import { Employee } from "../../models/Employee";
 import { useQuery } from "@tanstack/react-query";
 import apiClient from "../ApiClientImpl";

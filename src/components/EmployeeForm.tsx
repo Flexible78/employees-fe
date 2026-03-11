@@ -15,10 +15,8 @@ import { getIsoDateFromAge } from "../utils/date_functions";
 type Props = {
   employee?: Employee;
   submitter: (empl: Employee) => void;
-  layout?: "page" | "dialog";
 };
-const EmployeeForm: FC<Props> = ({ employee, submitter, layout = "page" }) => {
-  const isDialogLayout = layout === "dialog";
+const EmployeeForm: FC<Props> = ({ employee, submitter }) => {
   const {
     register,
     handleSubmit,
@@ -34,33 +32,21 @@ const EmployeeForm: FC<Props> = ({ employee, submitter, layout = "page" }) => {
         employee && event.preventDefault();
         reset(employee);
       }}
-      width="100%"
-      maxW={isDialogLayout ? "100%" : "960px"}
-      mx={isDialogLayout ? 0 : "auto"}
-      px={isDialogLayout ? 0 : { base: 4, sm: 6, md: 8 }}
-      py={isDialogLayout ? 0 : { base: 4, md: 6 }}
-      justifyContent="flex-start"
-      gap={isDialogLayout ? 4 : 8}
+      height={"80vh"}
+      justifyContent={"space-around"}
     >
       <SimpleGrid
-        columns={
-          isDialogLayout
-            ? {
-                base: 1,
-                md: 2,
-              }
-            : {
-                base: 1,
-                sm: 2,
-              }
-        }
-        gap={isDialogLayout ? 4 : 10}
-        width="100%"
+        columns={{
+          base: 1,
+          sm: 2,
+        }}
+        gap={10}
+        marginLeft={!!employee ? 0: {
+          base: "16",
+          lg: 72,
+        }}
       >
-        <Field.Root
-          invalid={!!errors.department}
-          width={isDialogLayout ? "100%" : "80%"}
-        >
+        <Field.Root invalid={!!errors.department} width="80%">
           <Field.Label>Department</Field.Label>
           <NativeSelect.Root>
             <NativeSelect.Field
@@ -78,11 +64,7 @@ const EmployeeForm: FC<Props> = ({ employee, submitter, layout = "page" }) => {
           </NativeSelect.Root>
           <Field.ErrorText>Selection of Department is required</Field.ErrorText>
         </Field.Root>
-        <Field.Root
-          invalid={!!errors.fullName}
-          required
-          width={isDialogLayout ? "100%" : "80%"}
-        >
+        <Field.Root invalid={!!errors.fullName} required width="80%">
           <Field.Label>Full Name</Field.Label>
           <Input
             placeholder="Enter full name"
@@ -90,11 +72,7 @@ const EmployeeForm: FC<Props> = ({ employee, submitter, layout = "page" }) => {
           />
           <Field.ErrorText>Name is required</Field.ErrorText>
         </Field.Root>
-        <Field.Root
-          invalid={!!errors.birthdate}
-          required
-          width={isDialogLayout ? "100%" : "80%"}
-        >
+        <Field.Root invalid={!!errors.birthdate} required width="80%">
           <Field.Label>Birthdate</Field.Label>
           <Input
             type="date"
@@ -105,11 +83,7 @@ const EmployeeForm: FC<Props> = ({ employee, submitter, layout = "page" }) => {
           />
           <Field.ErrorText>Birthdate is required</Field.ErrorText>
         </Field.Root>
-        <Field.Root
-          invalid={!!errors.salary}
-          required
-          width={isDialogLayout ? "100%" : "80%"}
-        >
+        <Field.Root invalid={!!errors.salary} required width="80%">
           <Field.Label>Salary</Field.Label>
           <Input
             placeholder="Enter salary"
@@ -124,27 +98,14 @@ const EmployeeForm: FC<Props> = ({ employee, submitter, layout = "page" }) => {
           <Field.ErrorText>{`salary should be in range [${employeesConfig.salary.min}-${employeesConfig.salary.max}]`}</Field.ErrorText>
         </Field.Root>
       </SimpleGrid>
-      <HStack
-        justifyContent={isDialogLayout ? "flex-end" : "center"}
-        flexWrap="wrap"
-        gap={3}
-      >
-        <Button type="submit" size={isDialogLayout ? "md" : "xl"} variant="subtle">
+      <HStack justifyContent={"space-around"}>
+        <Button type="submit" size={"xl"} variant="subtle">
           {!!employee ? "OK" : "Save"}
         </Button>
-        <Button type="reset" size={isDialogLayout ? "md" : "xl"} variant="subtle">
+        <Button type="reset" size={"xl"} variant="subtle">
           {!!employee ? "Undo" : "Reset"}
         </Button>
-        {!!employee && (
-          <Button
-            type="button"
-            onClick={() => submitter(employee)}
-            size={isDialogLayout ? "md" : "xl"}
-            variant="outline"
-          >
-            Cancel
-          </Button>
-        )}
+        {!!employee && <Button type="button" onClick={() => submitter(employee)}>Cancel</Button>}
       </HStack>
     </Stack>
   );
