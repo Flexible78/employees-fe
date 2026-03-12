@@ -1,4 +1,4 @@
-import { Button, HStack, VStack } from '@chakra-ui/react';
+import { Button, HStack, useBreakpointValue, VStack } from '@chakra-ui/react';
 import useEmployees from '../../services/hooks/useEmployees';
 import Employees from '../Employees'
 import Filters from '../Filters';
@@ -6,20 +6,25 @@ import { useFilters } from '../../state-management/filters-store';
 import { useMemo } from 'react';
 import { FilterFields } from '../../models/FilterFields';
 import { useSortByFields } from '../../state-management/sort-store';
+import EmployeesPortrait from '../EmployeesPortrait';
+import usePortrait from '../hooks/usePortrait';
+import  {FaSyncAlt} from "react-icons/fa"
+
 const HomePage = () => {
   const filters = useFilters();
   const resetOrder = useSortByFields(s => s.resetOrder)
   const {department, minAge, minSalary,maxAge, maxSalary, resetToDefault} = filters;
   const filterFields: FilterFields = useMemo(()=>({department, minAge, maxAge, minSalary, maxSalary}),[filters])
   const { employees, isLoading } = useEmployees(filterFields);
-  
+  const isPortrait = usePortrait()
   return (
     <VStack>
-      <HStack>
+      <HStack >
         <Filters/>
-        <Button onClick={() => {resetToDefault(); resetOrder()}}>Reset to Default</Button>
+        <Button onClick={() => {resetToDefault(); resetOrder()}}>{isPortrait?<FaSyncAlt></FaSyncAlt> :"Reset to Default"}</Button>
       </HStack>
-      <Employees employees={employees} isLoading={isLoading}/>
+      {!isPortrait ? <Employees employees={employees} isLoading={isLoading}/> : 
+      <EmployeesPortrait employees={employees} isLoading={isLoading}/>}
     </VStack>
   )
 }

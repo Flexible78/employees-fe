@@ -4,7 +4,6 @@ import { useFilters } from '../state-management/filters-store';
 import { FilterFields } from '../models/FilterFields';
 import FiltersForm from './FiltersForm';
 import DialogShaper from './DialogShaper';
-import { TbRuler } from 'react-icons/tb';
 
 const Filters = () => {
  const [open, setOpen] = useState(false)
@@ -14,7 +13,7 @@ const Filters = () => {
  const filtersData: FilterFields = useMemo(() =>({department,
      maxAge, minAge, maxSalary,minSalary}),[filters])
   const buttonName = useMemo(() => `${department === "Departments" ?
-    "All departments": `department: ${department}`}; salary: [${minSalary}-${maxSalary}]\
+    "": `${department}`} salary: [${minSalary}-${maxSalary}]\
     age: [${minAge}-${maxAge}]`, [filters])   
   return (
     <Box onClick={() => setOpen(true)}>

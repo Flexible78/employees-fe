@@ -35,3 +35,4 @@ export const useFilters = create<FiltersStore>((set) => ({
     set((state) => (state.minAge === minAge ? state : { minAge })),
   resetToDefault: () => set(() => ({...defaultValues}))
 }));
+
