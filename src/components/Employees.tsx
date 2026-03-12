@@ -1,21 +1,21 @@
 import { Avatar, IconButton, Spinner, Stack, Table } from "@chakra-ui/react";
 import { FC, ReactNode, useMemo } from "react";
 import { Employee } from "../models/Employee";
-import {FaSort, FaSortUp, FaSortDown} from "react-icons/fa"
+import { FaSort, FaSortDown, FaSortUp } from "react-icons/fa";
 import { Order, SortByFieldsStore, SortField, useSortByFields } from "../state-management/sort-store";
 import orderBy from "lodash/orderBy"
 import { useUserData } from "../state-management/auth-store";
-import useEmployeesMutation from "../services/hooks/useEmployeesMutation";
-import apiClient from "../services/ApiClientImpl";
-import ConfirmDialog from "./ConfirmationDialog";
-import { MdDelete } from "react-icons/md";
+
 import EditEmployee from "./EditEmployee";
 import DeleteEmployee from "./DeleteEmployee";
-
 type Props = {
-  employees: Employee[]
-  isLoading: boolean
-}
+  employees: Employee[];
+  isLoading: boolean;
+};
+
+const AVATAR_COL_WIDTH = "72px";
+const FULL_NAME_STICKY_LEFT = { base: 0, sm: AVATAR_COL_WIDTH };
+
 function updateSortingState(field: SortField, sortOptions: SortByFieldsStore):void {
     const order = sortOptions[field] ;
     let newOrder: Order = "asc"
@@ -36,9 +36,17 @@ function getSortingFields(sortOptions:SortByFieldsStore): SortField[] {
       const keys: SortField[] = Object.keys(sortOptions) as SortField[]
       return keys.filter(k => sortOptions[k] == "asc" || sortOptions[k] == "desc")
 }
+function resolveBirthdateValue(employee: Employee): string {
+  const rawValue =
+    (employee as { birthdate?: unknown }).birthdate ??
+    (employee as { birthDate?: unknown }).birthDate ??
+    (employee as { birthday?: unknown }).birthday ??
+    "";
+  const trimmed = typeof rawValue === "string" ? rawValue.trim() : String(rawValue).trim();
+  return trimmed || "-";
+}
 const Employees: FC<Props> = ({employees, isLoading}) => {
   const role = useUserData(s => s.role)
-  const mutationDel = useEmployeesMutation<Employee, string>((id) => apiClient.deleteEmployee(id))
   const sortOptions = useSortByFields();
   const sortedEmployees: Employee[] = useMemo(()=>{
     const sortFields: SortField[] = getSortingFields(sortOptions);
@@ -57,8 +65,15 @@ const Employees: FC<Props> = ({employees, isLoading}) => {
           <Table.Root size={{base: "sm", sm: "md", lg: "lg"}} stickyHeader>
             <Table.Header>
               <Table.Row bg="bg.subtle">
-                <Table.ColumnHeader hideBelow={"sm"}></Table.ColumnHeader>
-                <Table.ColumnHeader>Full Name {getIcon("fullName", sortOptions)}</Table.ColumnHeader>
+                <Table.ColumnHeader hideBelow={"sm"} width={AVATAR_COL_WIDTH}></Table.ColumnHeader>
+                <Table.ColumnHeader
+                  position="sticky"
+                  left={FULL_NAME_STICKY_LEFT}
+                  bg="bg.subtle"
+                  zIndex="2"
+                >
+                  Full Name {getIcon("fullName", sortOptions)}
+                </Table.ColumnHeader>
                 <Table.ColumnHeader>Department{getIcon("department", sortOptions)}</Table.ColumnHeader>
                 <Table.ColumnHeader>Salary{getIcon("salary", sortOptions)}</Table.ColumnHeader>
                 <Table.ColumnHeader hideBelow={"sm"}>Birthdate{getIcon("birthdate", sortOptions)}</Table.ColumnHeader>
@@ -69,16 +84,23 @@ const Employees: FC<Props> = ({employees, isLoading}) => {
             <Table.Body>
               {sortedEmployees.map((empl) => (
                 <Table.Row key={empl.id} >
-                  <Table.Cell hideBelow={"sm"} >
+                  <Table.Cell hideBelow={"sm"} width={AVATAR_COL_WIDTH}>
                     <Avatar.Root size={{sm:"sm", lg: "lg"}} >
                       <Avatar.Fallback name={empl .fullName} />
                       <Avatar.Image src={empl.avatar} />
                     </Avatar.Root>
                   </Table.Cell>
-                  <Table.Cell>{empl.fullName}</Table.Cell>
+                  <Table.Cell
+                    position="sticky"
+                    left={FULL_NAME_STICKY_LEFT}
+                    bg="bg"
+                    zIndex="1"
+                  >
+                    {empl.fullName}
+                  </Table.Cell>
                   <Table.Cell >{empl.department}</Table.Cell>
                   <Table.Cell >{empl.salary}</Table.Cell>
-                  <Table.Cell hideBelow={"sm"} >{empl.birthdate}</Table.Cell>
+                  <Table.Cell hideBelow={"sm"}>{resolveBirthdateValue(empl)}</Table.Cell>
                    { role === "ADMIN" && <Table.Cell >
                       <DeleteEmployee empl={empl}/>
                       </Table.Cell>}
